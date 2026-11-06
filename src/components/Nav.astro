@@ -1,22 +1,26 @@
 ---
-import { site } from "../lib/site";
+import { site, withBase } from "../lib/site";
 
 const path = Astro.url.pathname;
+const home = withBase();
 const links = [
-  { href: "/", label: "Beranda" },
-  { href: "/arsip", label: "Perpustakaan" },
-  { href: "/tentang", label: "Tentang" },
+  { href: home, label: "Beranda" },
+  { href: withBase("arsip"), label: "Perpustakaan" },
+  { href: withBase("tentang"), label: "Tentang" },
 ];
 
 function isActive(href: string): boolean {
-  if (href === "/") return path === "/";
-  return path === href || path.startsWith(href + "/");
+  const strip = (s: string) => s.replace(/\/+$/, "") || "/";
+  const current = strip(path);
+  const target = strip(href);
+  if (target === strip(home)) return current === target;
+  return current === target || current.startsWith(target + "/");
 }
 ---
 
 <header class="shell-header">
   <div class="shell-header__inner">
-    <a class="shell-brand" href="/">
+    <a class="shell-brand" href={home}>
       <span class="shell-brand__mark" aria-hidden="true">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
@@ -30,13 +34,7 @@ function isActive(href: string): boolean {
       </span>
     </a>
 
-    <button
-      type="button"
-      class="shell-menu"
-      id="shell-menu-btn"
-      aria-expanded="false"
-      aria-controls="shell-nav"
-    >
+    <button type="button" class="shell-menu" id="shell-menu-btn" aria-expanded="false" aria-controls="shell-nav">
       Menu
       <svg class="shell-menu__icon shell-menu__icon--open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <line x1="4" y1="6" x2="20" y2="6"></line>
@@ -70,7 +68,6 @@ function isActive(href: string): boolean {
   const nav = document.getElementById("shell-nav");
   const iconOpen = btn?.querySelector(".shell-menu__icon--open");
   const iconClose = btn?.querySelector(".shell-menu__icon--close");
-
   btn?.addEventListener("click", () => {
     const open = nav?.getAttribute("data-open") === "true";
     const next = !open;
@@ -92,7 +89,6 @@ function isActive(href: string): boolean {
     border-bottom: 1px solid var(--color-border);
     box-shadow: 0 1px 0 rgba(43, 38, 33, 0.02);
   }
-
   .shell-header__inner {
     display: flex;
     flex-wrap: wrap;
@@ -103,7 +99,6 @@ function isActive(href: string): boolean {
     margin: 0 auto;
     padding: var(--space-4) var(--page-pad);
   }
-
   .shell-brand {
     display: flex;
     align-items: center;
@@ -111,13 +106,11 @@ function isActive(href: string): boolean {
     color: inherit;
     text-decoration: none;
   }
-
   .shell-brand:focus-visible {
     outline: 2px solid var(--color-focus-ring);
     outline-offset: 3px;
     border-radius: var(--radius-sm);
   }
-
   .shell-brand__mark {
     display: inline-flex;
     align-items: center;
@@ -127,29 +120,20 @@ function isActive(href: string): boolean {
     border-radius: var(--radius-pill);
     background: var(--color-primary);
     color: var(--color-on-primary);
-    box-shadow: inset 0 1px 0 rgba(250, 246, 236, 0.18);
   }
-
-  .shell-brand__text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.1;
-  }
-
+  .shell-brand__text { display: flex; flex-direction: column; line-height: 1.1; }
   .shell-brand__name {
     font-family: var(--font-display);
     font-size: 1.375rem;
     font-weight: var(--weight-semibold);
     letter-spacing: var(--tracking-tight);
   }
-
   .shell-brand__tag {
     font-size: var(--text-caption);
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     color: var(--color-text-soft);
   }
-
   .shell-menu {
     display: none;
     align-items: center;
@@ -163,35 +147,19 @@ function isActive(href: string): boolean {
     font-size: var(--text-body-sm);
     cursor: pointer;
   }
-
-  .shell-menu:focus-visible {
-    outline: 2px solid var(--color-focus-ring);
-    outline-offset: 3px;
-  }
-
   .shell-nav {
     display: flex;
     align-items: center;
     gap: var(--space-6);
     font-size: var(--text-body-md);
   }
-
   .shell-nav__link {
     position: relative;
     color: inherit;
     text-decoration: none;
     padding-bottom: var(--space-1);
-    transition: color 140ms ease-out;
   }
-
-  .shell-nav__link:hover {
-    color: var(--color-primary);
-  }
-
-  .shell-nav__link[aria-current="page"] {
-    color: var(--color-text);
-  }
-
+  .shell-nav__link:hover { color: var(--color-primary); }
   .shell-nav__link[aria-current="page"]::after {
     content: "";
     position: absolute;
@@ -201,38 +169,15 @@ function isActive(href: string): boolean {
     height: 1px;
     background: var(--color-accent);
   }
-
-  .shell-nav__link:focus-visible {
-    outline: 2px solid var(--color-focus-ring);
-    outline-offset: 3px;
-    border-radius: var(--radius-sm);
-  }
-
   @media (max-width: 719px) {
-    .shell-menu {
-      display: inline-flex;
-    }
-
-    .shell-nav {
-      gap: var(--space-4);
-    }
-
-    .shell-nav[data-open="false"] {
-      display: none;
-    }
-
+    .shell-menu { display: inline-flex; }
+    .shell-nav[data-open="false"] { display: none; }
     .shell-nav[data-open="true"] {
       display: flex;
       flex-basis: 100%;
       flex-direction: column;
       align-items: flex-start;
       padding: var(--space-3) 0 var(--space-1);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .shell-nav__link {
-      transition: none;
     }
   }
 </style>
