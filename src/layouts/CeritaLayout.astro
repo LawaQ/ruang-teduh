@@ -1,0 +1,157 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import ProgressBar from '../components/ProgressBar.astro';
+import { formatTanggal, estimasiBaca, type Cerita } from '../lib/cerita';
+
+interface Props {
+  cerita: Cerita;
+  bodyText: string;
+  prev?: Cerita | null;
+  next?: Cerita | null;
+}
+
+const { cerita, bodyText, prev, next } = Astro.props;
+const { title, tanggal, genre, mood, cuplikan } = cerita.data;
+const menit = estimasiBaca(bodyText);
+---
+
+<BaseLayout title={title} description={cuplikan} ogType="article" canonicalPath={`/cerita/${cerita.id}`}>
+  <ProgressBar />
+
+  <article class="cerita container">
+    <header class="cerita__header">
+      <p class="cerita__back">
+        <a href="/">← Beranda</a>
+      </p>
+      <h1 class="cerita__title">{title}</h1>
+      <p class="cerita__meta meta">
+        <time datetime={tanggal.toISOString()}>{formatTanggal(tanggal)}</time>
+        <span aria-hidden="true">·</span>
+        <span>{genre}</span>
+        <span aria-hidden="true">·</span>
+        <span>{mood}</span>
+        <span aria-hidden="true">·</span>
+        <span>±{menit} menit baca</span>
+      </p>
+    </header>
+
+    <div class="cerita__body prose" data-cerita-body>
+      <slot />
+    </div>
+
+    <nav class="cerita__nav" aria-label="Navigasi antar cerita">
+      <div class="cerita__nav-item">
+        {
+          prev ? (
+            <a href={`/cerita/${prev.id}`}>
+              <span class="cerita__nav-label">← Cerita sebelumnya</span>
+              <span class="cerita__nav-title">{prev.data.title}</span>
+            </a>
+          ) : null
+        }
+      </div>
+      <div class="cerita__nav-item cerita__nav-item--next">
+        {
+          next ? (
+            <a href={`/cerita/${next.id}`}>
+              <span class="cerita__nav-label">Cerita berikutnya →</span>
+              <span class="cerita__nav-title">{next.data.title}</span>
+            </a>
+          ) : null
+        }
+      </div>
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .cerita__header {
+    margin-bottom: var(--space-7);
+    max-width: var(--measure);
+  }
+
+  .cerita__back {
+    margin: 0 0 var(--space-5);
+    font-size: var(--text-sm);
+  }
+
+  .cerita__back a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .cerita__back a:hover {
+    color: var(--color-accent);
+  }
+
+  .cerita__title {
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-bottom: var(--space-4);
+  }
+
+  .cerita__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .cerita__body {
+    margin-bottom: var(--space-8);
+  }
+
+  .cerita__nav {
+    display: grid;
+    gap: var(--space-5);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+    max-width: var(--measure);
+  }
+
+  .cerita__nav a {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    text-decoration: none;
+    color: var(--color-text);
+    min-height: 44px;
+  }
+
+  .cerita__nav a:hover .cerita__nav-title {
+    color: var(--color-accent);
+  }
+
+  .cerita__nav-label {
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+    font-family: var(--font-sans);
+  }
+
+  .cerita__nav-title {
+    font-family: var(--font-serif);
+    font-size: var(--text-md);
+    transition: color var(--transition);
+  }
+
+  .cerita__nav-item--next {
+    text-align: right;
+  }
+
+  .cerita__nav-item--next a {
+    align-items: flex-end;
+  }
+
+  @media (min-width: 640px) {
+    .cerita__nav {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .cerita__title {
+      font-size: var(--text-3xl);
+    }
+  }
+</style>
