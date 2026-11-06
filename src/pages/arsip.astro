@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCeritaPublik, formatTanggal, groupByTahun } from '../lib/cerita';
+import { withBase } from '../lib/site';
 
 const list = await getCeritaPublik();
 const byYear = groupByTahun(list);
@@ -33,7 +34,7 @@ const years = [...byYear.keys()].sort((a, b) => b - a);
                   <time class="tahun__date meta" datetime={c.data.tanggal.toISOString()}>
                     {formatTanggal(c.data.tanggal)}
                   </time>
-                  <a class="tahun__link" href={`/cerita/${c.id}`}>
+                  <a class="tahun__link" href={withBase(`cerita/${c.id}`)}>
                     {c.data.title}
                   </a>
                 </li>

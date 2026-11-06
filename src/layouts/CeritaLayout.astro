@@ -2,6 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import ProgressBar from '../components/ProgressBar.astro';
 import { formatTanggal, estimasiBaca, type Cerita } from '../lib/cerita';
+import { withBase } from '../lib/site';
 
 interface Props {
   cerita: Cerita;
@@ -21,7 +22,7 @@ const menit = estimasiBaca(bodyText);
   <article class="cerita container">
     <header class="cerita__header">
       <p class="cerita__back">
-        <a href="/">← Beranda</a>
+        <a href={withBase()}>← Beranda</a>
       </p>
       <h1 class="cerita__title">{title}</h1>
       <p class="cerita__meta meta">
@@ -43,7 +44,7 @@ const menit = estimasiBaca(bodyText);
       <div class="cerita__nav-item">
         {
           prev ? (
-            <a href={`/cerita/${prev.id}`}>
+            <a href={withBase(`cerita/${prev.id}`)}>
               <span class="cerita__nav-label">← Cerita sebelumnya</span>
               <span class="cerita__nav-title">{prev.data.title}</span>
             </a>
@@ -53,7 +54,7 @@ const menit = estimasiBaca(bodyText);
       <div class="cerita__nav-item cerita__nav-item--next">
         {
           next ? (
-            <a href={`/cerita/${next.id}`}>
+            <a href={withBase(`cerita/${next.id}`)}>
               <span class="cerita__nav-label">Cerita berikutnya →</span>
               <span class="cerita__nav-title">{next.data.title}</span>
             </a>
