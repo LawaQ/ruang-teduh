@@ -5,6 +5,14 @@ export const site = {
   deskripsi: "Kumpulan cerita pendek yang dibuat dengan tenang — untuk dibaca tanpa terburu-buru, di sela-sela hari.",
   penulis: "Mas Seto",
   email: "",
-  // Isi setelah domain Vercel diketahui
-  url: "https://ruang-teduh.vercel.app",
+  // GitHub Pages project URL
+  url: "https://lawaq.github.io/ruang-teduh",
 } as const;
+
+/** Base path GitHub Pages (harus diawali / dan diakhiri / di runtime Astro). */
+export function withBase(path = ""): string {
+  const base = import.meta.env.BASE_URL || "/";
+  const clean = path.replace(/^\//, "");
+  if (!clean) return base;
+  return `${base}${clean}`;
+}

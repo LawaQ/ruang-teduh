@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ruang-teduh.vercel.app/sitemap.xml
+Sitemap: https://lawaq.github.io/ruang-teduh/sitemap.xml

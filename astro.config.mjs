@@ -1,9 +1,10 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
-// Setelah deploy Vercel, ganti dengan domain production kamu, contoh:
-// site: 'https://ruang-teduh.vercel.app'
+// GitHub Pages project site:
+// https://lawaq.github.io/ruang-teduh/
 export default defineConfig({
-  site: 'https://ruang-teduh.vercel.app',
+  site: 'https://lawaq.github.io',
+  base: '/ruang-teduh',
   output: 'static',
 });
