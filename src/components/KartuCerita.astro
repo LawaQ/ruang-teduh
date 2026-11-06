@@ -1,0 +1,67 @@
+---
+import type { Cerita } from '../lib/cerita';
+import { formatTanggal } from '../lib/cerita';
+
+interface Props {
+  cerita: Cerita;
+}
+
+const { cerita } = Astro.props;
+const { title, tanggal, genre, cuplikan } = cerita.data;
+const href = `/cerita/${cerita.id}`;
+---
+
+<article class="kartu">
+  <header class="kartu__header">
+    <h2 class="kartu__title">
+      <a href={href}>{title}</a>
+    </h2>
+    <p class="kartu__meta meta">
+      <time datetime={tanggal.toISOString()}>{formatTanggal(tanggal)}</time>
+      <span aria-hidden="true">·</span>
+      <span>{genre}</span>
+    </p>
+  </header>
+  <p class="kartu__cuplikan">{cuplikan}</p>
+</article>
+
+<style>
+  .kartu {
+    padding-block: var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .kartu:first-child {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .kartu__title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+  }
+
+  .kartu__title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .kartu__title a:hover {
+    color: var(--color-accent);
+  }
+
+  .kartu__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-3);
+  }
+
+  .kartu__cuplikan {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    max-width: 52ch;
+  }
+</style>

@@ -1,0 +1,97 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCeritaPublik, formatTanggal, groupByTahun } from '../lib/cerita';
+
+const list = await getCeritaPublik();
+const byYear = groupByTahun(list);
+const years = [...byYear.keys()].sort((a, b) => b - a);
+---
+
+<BaseLayout
+  title="Arsip"
+  description="Daftar seluruh cerita yang sudah dipublikasikan, dikelompokkan berdasarkan tahun."
+  canonicalPath="/arsip"
+>
+  <div class="container">
+    <header>
+      <h1 class="page-title">Arsip</h1>
+      <p class="page-lead">Seluruh cerita, disusun seperti daftar isi.</p>
+    </header>
+
+    {
+      years.length === 0 ? (
+        <p>Belum ada cerita.</p>
+      ) : (
+        years.map((tahun) => (
+          <section class="tahun" aria-labelledby={`tahun-${tahun}`}>
+            <h2 id={`tahun-${tahun}`} class="tahun__heading">
+              {tahun}
+            </h2>
+            <ul class="tahun__list">
+              {(byYear.get(tahun) ?? []).map((c) => (
+                <li class="tahun__item">
+                  <time class="tahun__date meta" datetime={c.data.tanggal.toISOString()}>
+                    {formatTanggal(c.data.tanggal)}
+                  </time>
+                  <a class="tahun__link" href={`/cerita/${c.id}`}>
+                    {c.data.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .tahun {
+    margin-bottom: var(--space-7);
+  }
+
+  .tahun__heading {
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tahun__list {
+    list-style: none;
+  }
+
+  .tahun__item {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tahun__date {
+    font-size: var(--text-xs);
+  }
+
+  .tahun__link {
+    font-family: var(--font-serif);
+    font-size: var(--text-md);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .tahun__link:hover {
+    color: var(--color-accent);
+  }
+
+  @media (min-width: 640px) {
+    .tahun__item {
+      grid-template-columns: 11rem 1fr;
+      gap: var(--space-4);
+      align-items: baseline;
+    }
+  }
+</style>
