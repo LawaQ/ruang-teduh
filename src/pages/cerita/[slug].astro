@@ -1,0 +1,25 @@
+---
+import { render } from 'astro:content';
+import CeritaLayout from '../../layouts/CeritaLayout.astro';
+import { getCeritaPublik } from '../../lib/cerita';
+
+export async function getStaticPaths() {
+  const list = await getCeritaPublik();
+  return list.map((cerita, index) => ({
+    params: { slug: cerita.id },
+    props: {
+      cerita,
+      prev: list[index + 1] ?? null,
+      next: list[index - 1] ?? null,
+    },
+  }));
+}
+
+const { cerita, prev, next } = Astro.props;
+const { Content } = await render(cerita);
+const bodyText = cerita.body ?? '';
+---
+
+<CeritaLayout cerita={cerita} bodyText={bodyText} prev={prev} next={next}>
+  <Content />
+</CeritaLayout>
