@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../lib/site';
+---
+
+<BaseLayout
+  title="Tentang"
+  description={`Tentang ${site.nama} dan penulisnya.`}
+  canonicalPath="/tentang"
+>
+  <div class="container tentang">
+    <header>
+      <h1 class="page-title">Tentang</h1>
+    </header>
+
+    <div class="prose">
+      <p>
+        Saya Mas Seto. Tulisan di sini biasanya berangkat dari hal yang sudah lewat,
+        bukan dari ide yang disiapkan supaya terdengar penting.
+      </p>
+      <p>
+        Ruang Teduh hanya tempat kumpulannya. Tidak ada jadwal terbit.
+        Yang sudah selesai, diletakkan di rak.
+      </p>
+      {
+        site.email ? (
+          <p>
+            Surat: <a href={`mailto:${site.email}`}>{site.email}</a>
+          </p>
+        ) : null
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .tentang .prose {
+    margin-top: var(--space-5);
+  }
+
+  .tentang code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    padding: 0.1em 0.35em;
+    border-radius: var(--radius);
+  }
+
+  .note {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+</style>
