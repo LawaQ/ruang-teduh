@@ -1,0 +1,99 @@
+:root {
+  --color-canvas: #f7f2e9;
+  --color-surface: #fffcf6;
+  --color-surface-sunken: #efe7d9;
+  --color-surface-raised: #fffdf9;
+  --color-text: #2b2621;
+  --color-text-muted: #6b6154;
+  --color-text-soft: #8c8274;
+  --color-border: #e3d9c8;
+  --color-border-strong: #cdbfa6;
+  --color-primary: #4a5d4a;
+  --color-primary-hover: #3b4b3b;
+  --color-on-primary: #faf6ec;
+  --color-accent: #9c5b3c;
+  --color-focus-ring: #7a6a52;
+  --color-tone-sage: #c9d2c1;
+  --color-tone-sand: #e6d5b8;
+  --color-tone-clay: #dcc0ac;
+  --color-tone-dusk: #c6c3cd;
+  --color-tone-ink: #3e4a45;
+  --color-tone-ink-soft: #8a9a93;
+
+  --color-bg: var(--color-canvas);
+  --color-bg-elevated: var(--color-surface);
+  --color-text-faint: var(--color-text-soft);
+  --color-accent-hover: var(--color-primary-hover);
+
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-body: "Karla", "Source Sans 3", system-ui, sans-serif;
+  --font-serif: var(--font-display);
+  --font-sans: var(--font-body);
+
+  --text-heading-lg: 3.5rem;
+  --text-heading-md: 1.75rem;
+  --text-heading-sm: 1.1875rem;
+  --text-body-lg: 1.0625rem;
+  --text-body-md: 0.9375rem;
+  --text-body-sm: 0.8125rem;
+  --text-label-md: 0.8125rem;
+  --text-caption: 0.75rem;
+
+  --text-xs: var(--text-caption);
+  --text-sm: var(--text-body-sm);
+  --text-base: var(--text-body-md);
+  --text-md: var(--text-body-lg);
+  --text-lg: var(--text-heading-sm);
+  --text-xl: var(--text-heading-md);
+  --text-2xl: 2.25rem;
+  --text-3xl: var(--text-heading-lg);
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  --leading-tight: 1.12;
+  --leading-snug: 1.35;
+  --leading-relaxed: 1.7;
+  --leading-body: var(--leading-relaxed);
+  --leading-loose: 1.8;
+  --tracking-tight: -0.015em;
+  --tracking-wide: 0.08em;
+
+  --radius-sm: 8px;
+  --radius-card: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+  --radius: var(--radius-sm);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  --container-reading: 1080px;
+  --measure: 65ch;
+  --measure-wide: 42rem;
+  --page-pad: 16px;
+  --header-h: 4rem;
+  --transition: 160ms ease-out;
+  --focus-ring: 2px solid var(--color-focus-ring);
+  --focus-offset: 3px;
+}
+
+@media (min-width: 720px) {
+  :root {
+    --page-pad: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition: 0ms;
+  }
+}
