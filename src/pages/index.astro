@@ -1,0 +1,263 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Motif from "../components/Motif.astro";
+import { site } from "../lib/site";
+import { STORIES, GENRES, THEMES, TONES, type Story } from "../lib/stories";
+
+const featured = STORIES[0];
+const list = STORIES.slice(1);
+---
+
+<BaseLayout title={site.nama} description={site.deskripsi} canonicalPath="/">
+  <div class="beranda">
+    <section class="beranda-hero container">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <span class="hero-kicker">
+            <span class="hero-kicker__rule" aria-hidden="true"></span>
+            Edisi Musim Hujan
+          </span>
+          <h1 class="hero-title">Cerita yang siap menemani sore yang pelan.</h1>
+          <p class="hero-lead">
+            Kumpulan cerita pendek yang dibuat dengan tenang — untuk dibaca tanpa terburu-buru, di sela-sela hari.
+          </p>
+          <div class="hero-actions">
+            <a class="cta" href="/arsip">
+              Mulai membaca
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </a>
+            <a class="cta cta-quiet" href="/arsip">Jelajahi perpustakaan</a>
+          </div>
+        </div>
+
+        <article class="featured story-card" data-story-id={featured.id}>
+          <button type="button" class="story-open" data-open-story={featured.id} aria-label={`Pratinjau ${featured.title}`}>
+            <div class="featured-cover" style={`background: linear-gradient(160deg, ${TONES[featured.tone]} 0%, ${TONES[featured.tone]} 58%, var(--color-surface-sunken) 140%)`}>
+              <div class="cover-motif">
+                <Motif kind={featured.motif} />
+              </div>
+            </div>
+            <div class="featured-body">
+              <div class="story-top">
+                <span class="tag">{featured.genre}</span>
+                <span class="story-meta">{featured.minutes} menit</span>
+              </div>
+              <h2 class="story-title featured-title">{featured.title}</h2>
+              <p class="story-excerpt">{featured.excerpt}</p>
+            </div>
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <section class="beranda-themes container" aria-labelledby="tema-judul">
+      <div class="section-head">
+        <h2 id="tema-judul" class="section-title">Pilih suasana</h2>
+        <p class="section-note">Bukan kategori kaku — lebih seperti ruang untuk duduk sebentar.</p>
+      </div>
+      <div class="theme-grid">
+        {THEMES.map((theme) => (
+          <a class="theme-card" href="/arsip">
+            <span class="theme-count">{theme.count}</span>
+            <span class="theme-label">{theme.label}</span>
+            <span class="theme-note">{theme.note}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="beranda-list container" aria-labelledby="koleksi-judul">
+      <div class="section-head section-head--row">
+        <div>
+          <h2 id="koleksi-judul" class="section-title">Dari rak</h2>
+          <p class="section-note">Filter menurut nada cerita.</p>
+        </div>
+        <div class="genre-bar" role="group" aria-label="Filter genre">
+          {GENRES.map((g) => (
+            <button
+              type="button"
+              class="genre-chip"
+              data-genre={g}
+              aria-pressed={g === "Semua" ? "true" : "false"}
+            >
+              {g}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="feature-grid" id="story-grid">
+        {list.map((story) => (
+          <article class="story-card" data-story-id={story.id} data-genre={story.genre}>
+            <button type="button" class="story-open" data-open-story={story.id} aria-label={`Pratinjau ${story.title}`}>
+              <div class="card-cover" style={`background: linear-gradient(160deg, ${TONES[story.tone]} 0%, ${TONES[story.tone]} 58%, var(--color-surface-sunken) 140%)`}>
+                <div class="cover-motif">
+                  <Motif kind={story.motif} />
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="story-top">
+                  <span class="tag">{story.genre}</span>
+                  <span class="story-meta">{story.minutes} menit</span>
+                </div>
+                <h3 class="story-title">{story.title}</h3>
+                <p class="story-excerpt">{story.excerpt}</p>
+              </div>
+            </button>
+          </article>
+        ))}
+      </div>
+      <p class="empty-filter" id="empty-filter" hidden>Tidak ada cerita untuk filter ini.</p>
+    </section>
+  </div>
+
+  <dialog class="preview-dialog" id="preview-dialog" aria-labelledby="beranda-dialog-judul">
+    <div class="preview-panel">
+      <button type="button" class="dialog-close" id="dialog-close" aria-label="Tutup">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div id="dialog-body"></div>
+    </div>
+  </dialog>
+
+  <script define:vars={{ storiesJson: JSON.stringify(STORIES), tonesJson: JSON.stringify(TONES) }}>
+    const stories = JSON.parse(storiesJson);
+    const tones = JSON.parse(tonesJson);
+    const grid = document.getElementById("story-grid");
+    const empty = document.getElementById("empty-filter");
+    const chips = document.querySelectorAll(".genre-chip");
+    const dialog = document.getElementById("preview-dialog");
+    const dialogBody = document.getElementById("dialog-body");
+    const closeBtn = document.getElementById("dialog-close");
+
+    function motifSvg(kind) {
+      const stroke = "rgba(43, 38, 33, 0.36)";
+      const fill = "rgba(43, 38, 33, 0.13)";
+      const paths = {
+        sunset: `<circle cx="72" cy="58" r="17" fill="${fill}" stroke="${stroke}" stroke-width="1"/><path d="M28 84h88M18 96h108M38 108h68" stroke="${stroke}" stroke-width="1" stroke-linecap="round"/>`,
+        rain: `<path d="M30 54c0-9 7-16 16-16 2-9 10-15 19-15 11 0 20 8 20 19 0 1 0 2-.4 3" fill="none" stroke="${stroke}" stroke-width="1.2" stroke-linecap="round"/><path d="M40 74l-6 16M58 72l-6 18M76 74l-6 16M94 72l-6 18" stroke="${stroke}" stroke-width="1.2" stroke-linecap="round"/>`,
+        lamp: `<path d="M72 22v18" stroke="${stroke}" stroke-width="1.2"/><path d="M54 40h36l-7 26H61z" fill="${fill}" stroke="${stroke}" stroke-width="1.1" stroke-linejoin="round"/><path d="M72 66v34M52 100h40" stroke="${stroke}" stroke-width="1.1" stroke-linecap="round"/>`,
+        city: `<path d="M26 104V64h18v40M44 104V46h20v58M64 104V72h18v32M82 104V56h20v48" fill="none" stroke="${stroke}" stroke-width="1.1"/><path d="M50 58h3M60 58h3M50 70h3M60 70h3M68 82h3M90 68h3M90 82h3" stroke="${stroke}" stroke-width="1.6" stroke-linecap="round"/>`,
+        garden: `<path d="M18 100h108" stroke="${stroke}" stroke-width="1.1" stroke-linecap="round"/><path d="M60 100V56M84 100V64" stroke="${stroke}" stroke-width="1.1" stroke-linecap="round"/><path d="M60 74c-12 0-20-6-20-16 10 0 20 5 20 16zM60 62c0-11 7-18 18-18 0 11-7 18-18 18zM84 80c9 0 15-5 15-13-8 0-15 4-15 13z" fill="${fill}" stroke="${stroke}" stroke-width="1" stroke-linejoin="round"/>`,
+        train: `<path d="M16 102h112M30 92h84" stroke="${stroke}" stroke-width="1" stroke-linecap="round"/><path d="M40 92V52h64v40" fill="${fill}" stroke="${stroke}" stroke-width="1.2" stroke-linejoin="round"/><path d="M52 64h16M52 74h16" stroke="${stroke}" stroke-width="1.4" stroke-linecap="round"/><circle cx="54" cy="86" r="3" fill="${stroke}"/><circle cx="90" cy="86" r="3" fill="${stroke}"/>`,
+      };
+      return `<svg viewBox="0 0 144 128" aria-hidden="true" style="width:100%;height:100%;display:block">${paths[kind] || ""}</svg>`;
+    }
+
+    function openStory(id) {
+      const story = stories.find((s) => s.id === id);
+      if (!story || !dialog || !dialogBody) return;
+      const bg = tones[story.tone];
+      dialogBody.innerHTML = `
+        <div style="border-radius:var(--radius-card);overflow:hidden;background:linear-gradient(160deg,${bg} 0%,${bg} 58%,var(--color-surface-sunken) 140%);height:168px;position:relative">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+            <div style="width:46%;max-width:200px">${motifSvg(story.motif)}</div>
+          </div>
+        </div>
+        <h2 id="beranda-dialog-judul" style="margin:var(--space-4) 0 0;font-family:var(--font-display);font-size:1.625rem;font-weight:600;line-height:1.35;letter-spacing:-0.015em">${story.title}</h2>
+        <p style="margin:var(--space-2) 0 0;font-size:var(--text-body-md);line-height:1.7;color:var(--color-text-muted)">${story.excerpt}</p>
+        <blockquote style="margin:var(--space-4) 0 0;padding-left:var(--space-4);border-left:2px solid var(--color-border-strong);font-family:var(--font-display);font-style:italic;font-size:1.0625rem;line-height:1.6">${story.line}</blockquote>
+        <div style="display:flex;flex-wrap:wrap;gap:var(--space-3);margin-top:var(--space-5);padding-top:var(--space-4);border-top:1px solid var(--color-border)">
+          <a href="/arsip" class="cta" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:999px;background:var(--color-primary);border:1px solid var(--color-primary);color:var(--color-on-primary);font-size:13px;font-weight:600;text-decoration:none">Baca selengkapnya</a>
+          <button type="button" data-close-dialog class="cta cta-quiet" style="padding:12px 24px;border-radius:999px;border:1px solid var(--color-border);background:transparent;color:var(--color-text);font:inherit;font-size:13px;cursor:pointer">Nanti saja</button>
+        </div>
+      `;
+      dialog.showModal();
+      dialogBody.querySelector("[data-close-dialog]")?.addEventListener("click", () => dialog.close());
+    }
+
+    document.querySelectorAll("[data-open-story]").forEach((btn) => {
+      btn.addEventListener("click", () => openStory(btn.getAttribute("data-open-story")));
+    });
+
+    closeBtn?.addEventListener("click", () => dialog?.close());
+    dialog?.addEventListener("click", (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const genre = chip.getAttribute("data-genre");
+        chips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+        let visible = 0;
+        grid?.querySelectorAll("[data-genre]").forEach((card) => {
+          const match = genre === "Semua" || card.getAttribute("data-genre") === genre;
+          card.toggleAttribute("hidden", !match);
+          if (match) visible += 1;
+        });
+        empty?.toggleAttribute("hidden", visible !== 0);
+      });
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .beranda { font-family: var(--font-body); color: var(--color-text); }
+  .container { max-width: var(--container-reading); margin: 0 auto; padding-inline: var(--page-pad); }
+  .beranda-hero { padding-top: var(--space-8); padding-bottom: var(--space-2); }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr); gap: var(--space-8); align-items: center; }
+  .hero-kicker { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-caption); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--color-accent); font-weight: var(--weight-semibold); }
+  .hero-kicker__rule { width: 26px; height: 1px; background: var(--color-accent); }
+  .hero-title { margin: var(--space-5) 0 0; font-family: var(--font-display); font-weight: var(--weight-regular); font-size: clamp(2.5rem, 1.4rem + 2.6vw, var(--text-heading-lg)); line-height: var(--leading-tight); letter-spacing: var(--tracking-tight); text-wrap: balance; }
+  .hero-lead { margin: var(--space-5) 0 0; max-width: 46ch; font-size: var(--text-body-lg); line-height: var(--leading-relaxed); color: var(--color-text-muted); }
+  .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-6); }
+  .cta { display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-3) var(--space-5); border-radius: var(--radius-pill); background: var(--color-primary); color: var(--color-on-primary); border: 1px solid var(--color-primary); font-size: var(--text-body-md); font-weight: var(--weight-semibold); text-decoration: none; box-shadow: 0 10px 22px -16px rgba(43, 38, 33, 0.8); transition: background 160ms ease-out, border-color 160ms ease-out, color 160ms ease-out; }
+  .cta:hover { background: var(--color-primary-hover); border-color: var(--color-primary-hover); color: var(--color-on-primary); }
+  .cta-quiet { background: var(--color-surface); color: var(--color-text); border-color: var(--color-border); box-shadow: none; font-weight: var(--weight-regular); }
+  .cta-quiet:hover { border-color: var(--color-border-strong); background: var(--color-surface); color: var(--color-text); }
+  .story-card { border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); overflow: hidden; transition: transform 200ms ease-out, box-shadow 200ms ease-out, border-color 200ms ease-out; }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .story-card:hover { transform: translateY(-3px); box-shadow: 0 18px 34px -26px rgba(43, 38, 33, 0.45); border-color: var(--color-border-strong); }
+  }
+  .story-card:focus-within { border-color: var(--color-border-strong); box-shadow: 0 0 0 3px rgba(122, 106, 82, 0.18); }
+  .story-open { all: unset; box-sizing: border-box; display: block; width: 100%; cursor: pointer; }
+  .story-open:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 3px; border-radius: var(--radius-card); }
+  .featured-cover, .card-cover { position: relative; overflow: hidden; min-height: 148px; height: 148px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28); }
+  .featured-cover { height: 180px; min-height: 180px; transition: transform 260ms ease-out; }
+  .featured:hover .featured-cover { transform: rotate(-1.2deg) translateY(-3px); }
+  .cover-motif { position: absolute; inset: 0; opacity: 0.9; padding: var(--space-3); }
+  .featured-body, .card-body { padding: var(--space-4) var(--space-5) var(--space-5); }
+  .story-top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
+  .tag { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: var(--radius-pill); border: 1px solid var(--color-border-strong); color: var(--color-text-muted); font-size: var(--text-caption); letter-spacing: var(--tracking-wide); text-transform: uppercase; font-weight: var(--weight-medium); white-space: nowrap; }
+  .story-meta { font-size: var(--text-caption); color: var(--color-text-soft); }
+  .story-title { margin: var(--space-3) 0 0; font-family: var(--font-display); font-size: var(--text-heading-sm); font-weight: var(--weight-semibold); line-height: var(--leading-snug); letter-spacing: var(--tracking-tight); transition: color 160ms ease-out; }
+  .featured-title { font-size: 1.375rem; }
+  .story-card:hover .story-title { color: var(--color-accent); }
+  .story-excerpt { margin: var(--space-2) 0 0; font-size: var(--text-body-sm); line-height: var(--leading-relaxed); color: var(--color-text-muted); }
+  .beranda-themes, .beranda-list { padding-top: var(--space-9); }
+  .section-head { margin-bottom: var(--space-6); }
+  .section-head--row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--space-5); }
+  .section-title { font-family: var(--font-display); font-size: var(--text-heading-md); font-weight: var(--weight-regular); letter-spacing: var(--tracking-tight); }
+  .section-note { margin-top: var(--space-2); color: var(--color-text-muted); font-size: var(--text-body-md); }
+  .theme-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+  .theme-card { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); text-decoration: none; color: inherit; transition: border-color 160ms ease-out, transform 160ms ease-out; }
+  .theme-card:hover { border-color: var(--color-border-strong); transform: translateY(-2px); }
+  .theme-count { font-size: var(--text-caption); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--color-accent); font-weight: var(--weight-semibold); }
+  .theme-label { font-family: var(--font-display); font-size: var(--text-heading-sm); font-weight: var(--weight-semibold); }
+  .theme-note { font-size: var(--text-body-sm); color: var(--color-text-muted); line-height: var(--leading-relaxed); }
+  .genre-bar { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .genre-chip { padding: 8px 14px; border-radius: var(--radius-pill); border: 1px solid var(--color-border); background: transparent; color: var(--color-text-muted); font: inherit; font-size: var(--text-body-sm); cursor: pointer; transition: background 140ms ease-out, color 140ms ease-out, border-color 140ms ease-out; }
+  .genre-chip:hover { border-color: var(--color-border-strong); color: var(--color-text); }
+  .genre-chip[aria-pressed="true"] { background: var(--color-text); color: var(--color-canvas); border-color: var(--color-text); }
+  .feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-5); }
+  .empty-filter { margin-top: var(--space-6); color: var(--color-text-muted); }
+  .preview-dialog { border: none; padding: 0; background: transparent; max-width: min(560px, calc(100vw - 32px)); width: 100%; color: var(--color-text); }
+  .preview-dialog::backdrop { background: rgba(43, 38, 33, 0.42); backdrop-filter: blur(2px); }
+  .preview-panel { position: relative; background: var(--color-surface); border-radius: var(--radius-lg); padding: var(--space-5); border: 1px solid var(--color-border); box-shadow: 0 24px 48px -28px rgba(43, 38, 33, 0.55); }
+  .preview-dialog[open] .preview-panel { animation: beranda-rise 220ms ease-out; }
+  @keyframes beranda-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .dialog-close { position: absolute; top: var(--space-3); right: var(--space-3); display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: none; border-radius: var(--radius-pill); background: transparent; color: var(--color-text); cursor: pointer; }
+  .dialog-close:hover { background: var(--color-surface-sunken); }
+  @media (max-width: 959px) {
+    .hero-grid { grid-template-columns: minmax(0, 1fr); }
+    .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .theme-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 639px) {
+    .feature-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .story-card, .story-title, .featured-cover, .cta, .genre-chip, .story-open, .theme-card { transition: none; }
+    .preview-dialog[open] .preview-panel { animation: none; }
+  }
+</style>
