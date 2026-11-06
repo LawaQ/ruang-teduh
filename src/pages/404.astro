@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Halaman tidak ditemukan" description="Halaman yang kamu cari tidak ada.">
+  <div class="container not-found">
+    <h1 class="page-title">Halaman tidak ditemukan</h1>
+    <p class="page-lead">
+      Alamat ini tidak mengarah ke mana-mana. Mungkin cerita sudah dipindah, atau tautannya keliru.
+    </p>
+    <p>
+      <a href="/">Kembali ke beranda</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found {
+    max-width: 32rem;
+  }
+</style>
